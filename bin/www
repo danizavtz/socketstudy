@@ -1,0 +1,17 @@
+#!/usr/bin/env node
+const app = require('../app');
+const http = require('http').Server(app);
+const io = require('socket.io')(http)
+http.listen(process.env.PORT);
+io.on('connection', (socket) => {    
+    const qtd = socket.client.conn.server.clientsCount;
+    io.emit('novaconexao', qtd);
+    socket.on('disconnect', () => {
+        io.emit('disconnecteduser', qtd - 1);
+    });
+});
+
+// next line is the money
+app.set('socketio', io);
+
+console.log('Microsservice login listening at http://localhost:%s', process.env.PORT);
